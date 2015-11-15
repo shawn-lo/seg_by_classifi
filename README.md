@@ -1,5 +1,4 @@
-# seg_by_classifi
-Segmentation by Classification
+# Segmentation by Classification
 
 This is the final project of CS 559: Machine Learning. However it's not only a course project. It would be the base of doing image segmentation.
 
