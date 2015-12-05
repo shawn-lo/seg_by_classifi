@@ -1,0 +1,2 @@
+The accuracy of Knn for k = 3 is 0.3547297297297297
+The accuracy of SVM is 0.65

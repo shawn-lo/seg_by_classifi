@@ -1,12 +1,25 @@
 import numpy as np
+from plyfile import PlyData, PlyElement
 
 class parsing:
     def __init__(self):
         pass
-    # parse_ply_data(): parsing raw data to ndarray
+    # parse_ply_data()
+    # @param {string} path
+    # #return {numpy array}
+    def parse_ply_data(self, path):
+        plydata = PlyData.read(path)
+        data = plydata['vertex'][:]
+#        print(type(data))
+#        print(data.shape)
+#        print(data[0])
+        return data
+
+
+    # parse_txt_data(): parsing raw data to ndarray
     # @param {string} path: path of raw data about extracted features
     # @return {numpy array}: features data
-    def parse_ply_data(self, path):
+    def parse_txt_data(self, path):
         i = 0
         data_type = []
         features_data = np.zeros((1108,55),dtype='float32')
@@ -34,7 +47,7 @@ class parsing:
         size = raw_data.shape[0]
         feature = np.zeros((size, 52))
         for i in range(0, size):
-            feature[i][0:52] = raw_data[i][3:55]
+            feature[i][0:53] = raw_data[i][3:55]
         return feature
 
     #@return {list}
@@ -52,4 +65,39 @@ class parsing:
                 data.append(raw_data[i])
                 label.append(raw_label[i])
         return [data, label]
+
+    def parse_reduced_overseg(self, raw_data, raw_label, class_set):
+        size = raw_data.shape[0]
+        seg = []
+        for i in range(0, size):
+            if raw_label[i] in class_set:
+                seg.append(raw_data[i][1])
+        return seg
+
+    def colorize(self, magic):
+        if magic != -1:
+            r = (magic * magic * magic * 2) % 255
+            g = (magic * magic * 10) % 255
+            b = (magic * 50) % 255
+        else:
+            r = 0
+            g = 0
+            b = 0
+        return [r, g, b]
+
+    # @param {dict} dic: predicted label
+    def parse2plot(self, plydata, dic):
+        size = plydata.shape[0]
+        plotdata = []
+        for i in range(0,size):
+            temp = []
+            if plydata[i][8] in dic:
+                label = dic[plydata[i][8]]
+            else:
+                label = -1
+            temp = (plydata[i][0], plydata[i][1], plydata[i][2], self.colorize(label)[0], self.colorize(label)[1], self.colorize(label)[2])
+            plotdata.append(temp)
+
+        return plotdata
+
 

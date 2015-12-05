@@ -6,6 +6,8 @@ from sklearn.neighbors import KDTree
 class nearestneighbors:
     def __init__(self, k_value):
         self.k_value = k_value
+        self.accuracy = 0
+        self.predicted_label = []
 
     # knn() : classifier
     # @param {ndarray} train_data: training data
@@ -39,13 +41,21 @@ class nearestneighbors:
                     labels[train_label[j]] = 1
             #print(labels)
             predicted_label = max(labels.keys(), key=(lambda key: labels[key]))
+            self.predicted_label.append(predicted_label)
 
             if predicted_label == test_label[i]:
                 correct += 1
             else:
                 wrong += 1
 
-        print(correct,' ',wrong)
-        return correct/(correct+wrong)
+        print('There are ',correct,' correct and ', wrong, ' wrong.')
+        self.accuracy = correct/(correct+wrong)
+        #return self
+
+    def predict(self):
+        return self.predicted_label
+
+    def get_accuracy(self):
+        return self.accuracy
 
 
