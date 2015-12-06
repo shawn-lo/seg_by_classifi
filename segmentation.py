@@ -12,6 +12,8 @@ import analysis
 from sklearn import svm
 from sklearn.svm import SVC
 from sklearn import tree
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import AdaBoostClassifier
 
 if __name__ == '__main__':
     # load raw txt data
@@ -19,7 +21,7 @@ if __name__ == '__main__':
     extracted_features_path = './Data/Cornell/features/office_data_nodefeats.txt'
     raw_data = parser.parse_txt_data(extracted_features_path)
     # load ply data, here just test for office scene 1
-    pic_path_set = ['./Data/Cornell/office_data_ply/scene9.ply']
+    pic_path_set = ['./Data/Cornell/office_data_ply/scene20.ply']
     for pic_path in pic_path_set:
         office_data = parser.parse_ply_data(pic_path)
         print(office_data)
@@ -68,20 +70,12 @@ if __name__ == '__main__':
             reduced_test_overseg = parser.parse_reduced_overseg(raw_test_data, test_label, reduced_label)
 
             # over-segmentation to segmentation
-            #print(raw_train_data)
-            #print(reduced_label)
             overseg_dict = analyser.over2seg(raw_data, reduced_label)
-            #print(overseg_dict)
-
-            #print(reduced_train_label)
-            #print(reduced_test_label)
 
             k_classifier.knn(reduced_train_data, reduced_test_data, reduced_train_label, reduced_test_label)
             acc = k_classifier.get_accuracy()
             print(acc)
             predicted = k_classifier.predict()
-            #print(reduced_test_overseg)
-            #print(predicted)
 
             test_overseg_dict = analyser.construct_dict(reduced_test_overseg, predicted)
 
@@ -124,27 +118,48 @@ if __name__ == '__main__':
 
         # Deal with data, make it fit for new class label.
         reduced_train_data, reduced_train_label = parser.parse_reduced_data(train_data, train_label, reduced_label)
+        reduced_train_overseg = parser.parse_reduced_overseg(raw_train_data, train_label, reduced_label)
         reduced_test_data, reduced_test_label = parser.parse_reduced_data(test_data, test_label, reduced_label)
-        print(len(reduced_train_data))
-        print(len(reduced_train_label))
+        reduced_test_overseg = parser.parse_reduced_overseg(raw_test_data, test_label, reduced_label)
+
+        overseg_dict = analyser.over2seg(raw_data, reduced_label)
+
+
         #print(type(reduced_train_data), type(reduced_train_label))
         #clf = SVC(decision_function_shape='ovr')
-        clf = tree.DecisionTreeClassifier()
+        #clf = RandomForestClassifier(n_estimators=20)
+        #clf = AdaBoostClassifier(tree.DecisionTreeClassifier(max_depth=2),n_estimators=600,learning_rate=1.5,algorithm="SAMME")
+        clf = AdaBoostClassifier(tree.DecisionTreeClassifier(max_depth=2),n_estimators=1000,learning_rate=1.5,algorithm="SAMME")
+
+        #clf = tree.DecisionTreeClassifier()
         clf.fit(np.asarray(reduced_train_data), np.asarray(reduced_train_label))
-        predict = clf.predict(np.asarray(reduced_test_data))
+        predicted = clf.predict(np.asarray(reduced_test_data))
+        test_overseg_dict = analyser.construct_dict(reduced_test_overseg, predicted)
+
         correct = 0
         wrong = 0
-        for i in range(0, len(predict)):
-            if predict[i] == reduced_test_label[i]:
+        for i in range(0, len(predicted)):
+            if predicted[i] == reduced_test_label[i]:
                 correct += 1
             else:
                 wrong += 1
         #print(correct,' ', wrong)
         #print('The accuracy of SVM is: ',correct/(correct+wrong))
-        svm_acc = correct/(correct+wrong)
+        adv_acc = correct/(correct+wrong)
+        print(adv_acc)
         with open('./result.txt', 'a') as f:
-            string = 'The accuracy of SVM is '+ str(svm_acc) + '\n'
+            string = 'The accuracy of SVM is '+ str(adv_acc) + '\n'
             f.write(string)
+
+#======
+# plot
+#======
+            plotdata = parser.parse2plot(office_data, test_overseg_dict)
+            ply_plot = np.array(plotdata, dtype=[('x', 'f4'), ('y', 'f4'), ('z','f4'), ('red','u1'), ('green', 'u1'), ('blue','u1')])
+            #print(ply_plot)
+            el = PlyElement.describe(ply_plot, 'vertex')
+            PlyData([el]).write('test2.ply')
+
 
 
 
