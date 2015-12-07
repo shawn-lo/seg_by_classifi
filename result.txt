@@ -1,2 +1,10 @@
-The accuracy of Knn for k = 3 is 0.3701067615658363
-The accuracy of SVM is 0.7570093457943925
+The accuracy of Knn for k = 3 is 0.4
+The accuracy of Decision Tree is 0.5727272727272728
+The accuracy of Decision Tree(Adaboost) is 0.8363636363636363
+The accuracy of SVM(OVO) is 0.8
+The accuracy of SVM(OVR) is 0.8
+The accuracy of SVM is 0.8
+The accuracy of LinearSVM is 0.5545454545454546
+The accuracy of SVM with C=1 is 0.38181818181818183
+The accuracy of SVM with C=100 is 0.5909090909090909
+[0.4088073067648136, 0.5874318267958039, 0.73902307347214, 0.7522923956856642, 0.7522923956856642, 0.7522923956856642, 0.5279762549594433, 0.35566677364456434, 0.5709892583513102, 0.0, 0.0]

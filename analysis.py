@@ -5,6 +5,29 @@ class analysis:
     def __init__(self):
         pass
 
+    # use cross-validate, 5-fold
+    def cross_validation(self, data, i):
+        dataset = []
+        size = data.shape[0]
+        interval = int(size/5)
+        for j in range(0, 5):
+            dataset.append(data[interval*j:interval*(j+1)])
+        train_data = dataset[i]
+        if i < 4:
+            test_data = dataset[4]
+        else:
+            test_data = dataset[0]
+        for j in range(0, 5):
+            if i < 4:
+                if j != 4 and j != i:
+                    test_data = np.concatenate((test_data, data[j]), axis=0)
+            else:
+                if j != 0 and j!= i:
+                    test_data = np.concatenate((test_data, data[j]), axis=0)
+        print(len(train_data))
+        print(len(test_data))
+        return [train_data, test_data]
+
     def split(self, dataset, percent):
         np.random.shuffle(dataset)
         size = dataset.shape[0]
